@@ -24,14 +24,14 @@ const readOnly = () => {
     DELETE: 0
   };
 };
-const grantAllWithNoEdit = () => {
-  return {
-    GET: 1,
-    POST: 1,
-    PUT: 0,
-    DELETE: 1
-  };
-};
+// const grantAllWithNoEdit = () => {
+//   return {
+//     GET: 1,
+//     POST: 1,
+//     PUT: 0,
+//     DELETE: 1
+//   };
+// };
 
 module.exports = {
   [roles.ADMIN]: {
@@ -49,7 +49,7 @@ module.exports = {
   [roles.CUSTOMER]: {
     movies: readOnly(),
     users: prohibitAll(),
-    reservations: grantAllWithNoEdit(), //if a user reserved a wrong seat and want to modify, he should DELETE his/her reservation and reserve a new seat
+    reservations: prohibitAll(), //if a user reserved a wrong seat and want to modify, he should DELETE his/her reservation and reserve a new seat
     rooms: prohibitAll()
   },
   [roles.GUEST]: {

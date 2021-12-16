@@ -1,5 +1,3 @@
-const multer = require('multer');
-const sharp = require('sharp');
 const User = require('./../models/userModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
@@ -78,83 +76,5 @@ exports.getMe = catchAsync(async (req, res, next) => {
     data: {
       user
     }
-  });
-});
-
-//to change the user photo
-////////////////////////////////////////////////////
-const multerStorage = multer.memoryStorage();
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-});
-exports.uploadPhoto = upload.single('photo');
-
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-
-  req.file.filename = `user-${req.user.id}.jpeg`;
-
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/images/users/${req.file.filename}`);
-
-  next();
-});
-
-exports.changeMyPhoto = catchAsync(async (req, res, next) => {
-  const userID = req.user._id;
-  if (!userID) return next(new AppError('authentication failed', 401));
-
-  if (!req.file) return next(new AppError('please upload a photo', 400));
-  // const user = await User.findById(userID);
-  const image = req.file.filename;
-
-  await User.findByIdAndUpdate(
-    userID,
-    { image },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
-
-  res.status(200).json({
-    status: 'success',
-    message: 'photo updated'
-  });
-});
-
-exports.updateMe = catchAsync(async (req, res, next) => {
-  if (!req.body.name || !req.body.email || !req.body.birthdate) {
-    return next(
-      new AppError('The request must contain a name, email and birthdate', 400)
-    );
-  }
-  const filteredBody = {
-    name: req.body.name,
-    email: req.body.email,
-    birthdate: req.body.birthdate
-  };
-
-  await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true
-  });
-
-  res.status(200).json({
-    status: 'success',
-    message: 'user updated'
   });
 });

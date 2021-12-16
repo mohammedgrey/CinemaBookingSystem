@@ -5,17 +5,14 @@ const permit = require('../controllers/middlewares/permit');
 
 const router = express.Router();
 
-router.use(protect, permit);
-
-router.get('/me', reservationController.getMyReservations);
-router.get('/movie/:id', reservationController.getMovieReservations);
+router.get('/me', protect, reservationController.getMyReservations);
 router
   .route('/')
-  .get(reservationController.getAllReservations)
-  .post(reservationController.postReservation);
+  .get(protect, permit, reservationController.getAllReservations)
+  .post(protect, reservationController.postReservation);
 router
   .route('/:id')
-  .get(reservationController.getReservation)
-  .delete(reservationController.deleteReservation);
+  .get(protect, permit, reservationController.getReservation)
+  .delete(protect, reservationController.deleteReservation);
 
 module.exports = router;

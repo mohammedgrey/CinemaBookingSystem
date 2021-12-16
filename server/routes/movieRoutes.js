@@ -6,6 +6,8 @@ const savePhoto = require('../controllers/middlewares/savePhoto');
 
 const router = express.Router();
 
+router.get('/:id/reservations', movieController.getMovieReservations);
+
 router
   .route('/')
   .get(movieController.getAllMovies)

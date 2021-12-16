@@ -2,6 +2,7 @@ const Reservation = require('./../models/reservationModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const roles = require('./data/roles');
 
 exports.getAllReservations = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(Reservation.find(), req.query)
@@ -38,32 +39,6 @@ exports.getMyReservations = catchAsync(async (req, res, next) => {
     results: reservations.length,
     data: {
       reservations
-    }
-  });
-});
-
-exports.getMovieReservations = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(
-    Reservation.find({ movie: req.params.id }),
-    req.query
-  )
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const reservations = await features.query;
-
-  let reservationsArray = [];
-  reservations.forEach(reservation => {
-    reservationsArray = [...reservationsArray, ...reservation.reservedSeats];
-  });
-  reservationsArray.sort((a, b) => a - b);
-
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    data: {
-      reservations: reservationsArray
     }
   });
 });
@@ -114,12 +89,23 @@ exports.postReservation = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReservation = catchAsync(async (req, res, next) => {
-  const reservation = await Reservation.findByIdAndDelete(req.params.id);
+  const reservation = await Reservation.findById(req.params.id);
 
-  if (!reservation) {
+  if (!reservation)
     return next(new AppError('No reservation found with that ID', 404));
-  }
 
+  if (
+    req.user.role === roles.CUSTOMER &&
+    !reservation.user.equals(req.user._id)
+  )
+    return next(
+      new AppError(
+        'A user with a customer role can only delete his/her reservations',
+        401
+      )
+    );
+
+  await Reservation.findByIdAndDelete(req.params.id);
   res.status(204).json({
     status: 'success',
     data: null

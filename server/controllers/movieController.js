@@ -1,4 +1,5 @@
 const Movie = require('./../models/movieModel');
+const Reservation = require('./../models/reservationModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
@@ -118,5 +119,31 @@ exports.deleteMovie = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: 'success',
     data: null
+  });
+});
+
+exports.getMovieReservations = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Reservation.find({ movie: req.params.id }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const reservations = await features.query;
+
+  let reservationsArray = [];
+  reservations.forEach(reservation => {
+    reservationsArray = [...reservationsArray, ...reservation.reservedSeats];
+  });
+  reservationsArray.sort((a, b) => a - b);
+
+  // SEND RESPONSE
+  res.status(200).json({
+    status: 'success',
+    data: {
+      reservations: reservationsArray
+    }
   });
 });
