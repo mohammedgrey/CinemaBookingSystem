@@ -1,28 +1,14 @@
-import { CssBaseline, ThemeProvider } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Home } from './pages/Home';
-
-import { getAppTheme } from './styles/theme';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AllProviders from './wrappers/AllProviders';
+import Layout from './wrappers/Layout';
 
 function App() {
-  const routes = [{ name: 'home', path: '/', component: Home }];
-
-  const theme = useMemo(() => getAppTheme(), []);
-
-  const addRoute = (route: any) => <Route key={route.path} path={route.path} component={route.component} exact />;
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <AllProviders>
       <Router>
-        <Switch>
-          {/* <Layout> */}
-          {routes.map((route: any) => addRoute(route))}
-          {/* </Layout> */}
-        </Switch>
+        <Layout />
       </Router>
-    </ThemeProvider>
+    </AllProviders>
   );
 }
 

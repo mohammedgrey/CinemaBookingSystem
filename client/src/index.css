@@ -1,0 +1,13 @@
+a {
+  color: 'inherit';
+  text-decoration: none;
+}
+.nav-link {
+  margin-inline: 8px;
+  color: white;
+  font-weight: 500;
+}
+.nav-link.active {
+  color: #e9edf1;
+  border-bottom: 3px solid #e9edf1;
+}
