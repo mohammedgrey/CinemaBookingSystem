@@ -2,6 +2,7 @@ const User = require('./../models/userModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const roles = require('./data/roles');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(User.find(), req.query)
@@ -36,15 +37,39 @@ exports.getUserProfile = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
+exports.postUser = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+  res.status(201).json({
+    status: 'success',
+    data: {
+      newUser
+    }
   });
+});
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  // let user = await User.findByIdAndUpdate(req.params.id, req.body, {
+  //   new: true,
+  //   runValidators: true
+  // });
+
+  // 1) Get user from collection
+  const user = await User.findById(req.params.id).select('+password');
 
   if (!user) {
     return next(new AppError('No user found with that ID', 404));
   }
+  if (req.body.email) user.email = req.body.email;
+  if (req.body.username) user.username = req.body.username;
+  if (req.body.firstName) user.firstName = req.body.firstName;
+  if (req.body.lastName) user.lastName = req.body.lastName;
+  if (req.body.password) user.password = req.body.password;
+  if (req.body.role) user.role = req.body.role;
+
+  if (user.wishesToManage && user.role === roles.MANAGER) {
+    user.wishesToManage = false;
+  }
+  await user.save();
 
   res.status(200).json({
     status: 'success',

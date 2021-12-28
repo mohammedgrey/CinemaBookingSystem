@@ -23,15 +23,24 @@ exports.getAllReservations = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyReservations = catchAsync(async (req, res, next) => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1); //minus 1 day
   const features = new APIFeatures(
-    Reservation.find({ user: req.user._id }),
+    Reservation.find({
+      user: req.user._id
+    }),
     req.query
   )
     .filter()
     .sort()
     .limitFields()
     .paginate();
-  const reservations = await features.query;
+  const reservations = await features.query.populate({
+    path: 'movie',
+    match: {
+      date: { $gte: yesterday }
+    }
+  });
 
   // SEND RESPONSE
   res.status(200).json({
@@ -68,7 +77,7 @@ exports.postReservation = catchAsync(async (req, res, next) => {
     reservationsArray = [...reservationsArray, ...reservation.reservedSeats];
   });
   const wantToReserveSeats = req.body.reservedSeats;
-  if (!wantToReserveSeats)
+  if (!wantToReserveSeats || !wantToReserveSeats.length)
     return next(
       new AppError(
         'You must reserve at least one seat. Make sure you include "reservedSeats" array field in the request body',
@@ -89,7 +98,9 @@ exports.postReservation = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReservation = catchAsync(async (req, res, next) => {
-  const reservation = await Reservation.findById(req.params.id);
+  const reservation = await Reservation.findById(req.params.id).populate(
+    'movie user'
+  );
 
   if (!reservation)
     return next(new AppError('No reservation found with that ID', 404));
@@ -102,6 +113,23 @@ exports.deleteReservation = catchAsync(async (req, res, next) => {
       new AppError(
         'A user with a customer role can only delete his/her reservations',
         401
+      )
+    );
+  //check the 3 hours difference
+  const currTimeDate = new Date();
+  const movieStartTimeDate = new Date(reservation.movie.startTime);
+  const movieStartFullTimeDate = new Date(reservation.movie.date);
+  movieStartFullTimeDate.setHours(movieStartTimeDate.getHours());
+  movieStartFullTimeDate.setMinutes(movieStartTimeDate.getMinutes());
+  movieStartFullTimeDate.setSeconds(movieStartTimeDate.getSeconds());
+
+  const hoursDiff = Math.abs(movieStartFullTimeDate - currTimeDate) / 36e5;
+
+  if (hoursDiff < 3)
+    return next(
+      new AppError(
+        'You can only cancel reservations 3 hours before the start time of the movie.',
+        400
       )
     );
 

@@ -6,14 +6,16 @@ const AppError = require('./../utils/appError');
 const { thereIsATimeSlotAvailable } = require('../utils/helpers');
 
 exports.getAllMovies = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Movie.find({ date: { $gte: new Date() } }), {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1); //minus 1 day
+  const features = new APIFeatures(Movie.find({ date: { $gte: yesterday } }), {
     ...req.query
   })
     .filter()
     .sort()
     .limitFields()
     .paginate();
-  const movies = await features.query;
+  const movies = await features.query.populate('room');
 
   // SEND RESPONSE
   res.status(200).json({
@@ -40,9 +42,15 @@ exports.getMovie = catchAsync(async (req, res, next) => {
 });
 
 exports.postMovie = catchAsync(async (req, res, next) => {
-  const allMovieDates = await Movie.find({ date: { $gte: new Date() } }).select(
-    'startTime endTime'
-  );
+  // const allMovieDates = await Movie.find({ date: { $gte: new Date() } }).select(
+  //   'startTime endTime'
+  // );
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1); //minus 1 day
+  const allMovieDates = await Movie.find({
+    room: req.body.room,
+    date: { $gte: yesterday }
+  }).select('startTime endTime');
   const currentMovieDate = {
     startTime: req.body.startTime,
     endTime: req.body.endTime
@@ -56,7 +64,7 @@ exports.postMovie = catchAsync(async (req, res, next) => {
   if (!okayToAddMovie)
     return next(
       new AppError(
-        'There is a time conflict between the movie you are trying to add and an already existing movie',
+        'There is a time conflict between the movie you are trying to add and an already existing movie in the same room',
         400
       )
     );
@@ -71,9 +79,13 @@ exports.postMovie = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMovie = catchAsync(async (req, res, next) => {
-  const allMovieDates = await Movie.find({ date: { $gte: new Date() } }).select(
-    'startTime endTime'
-  );
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1); //minus 1 day
+  const allMovieDates = await Movie.find({
+    room: req.body.room,
+    date: { $gte: yesterday },
+    _id: { $ne: req.params.id }
+  }).select('startTime endTime');
   const currentMovieDate = {
     startTime: req.body.startTime,
     endTime: req.body.endTime

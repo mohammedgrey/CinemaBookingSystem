@@ -19,6 +19,7 @@ import useUser from '../../hooks/system/useUser';
 import { NavLink, useHistory } from 'react-router-dom';
 import routes from '../../config/routes';
 import roles from '../../config/roles';
+import { navbarHeight } from '../../styles/mui/constants';
 
 interface NavbarProps {}
 const Navbar: React.FC<NavbarProps> = () => {
@@ -31,7 +32,8 @@ const Navbar: React.FC<NavbarProps> = () => {
         {routes.map((route: any) => {
           const isAllowedToAccess =
             (!user && route?.roles?.includes(roles.GUEST)) || route?.roles?.includes(user?.role);
-          if (!['/', '/login', '/signup'].includes(route.path) && isAllowedToAccess) return InnerComponent(route);
+          if (!['/', '/login', '/signup', '/movie/:id', '/profile'].includes(route.path) && isAllowedToAccess)
+            return InnerComponent(route);
           return null;
         })}
       </React.Fragment>
@@ -59,7 +61,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   );
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed">
+      <AppBar position="fixed" sx={{ height: navbarHeight }}>
         <Toolbar>
           <Box display="flex" sx={{ flexGrow: 1, alignItems: 'center' }}>
             <Hidden mdUp>{MenuButton}</Hidden>
@@ -91,11 +93,15 @@ const Navbar: React.FC<NavbarProps> = () => {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Button variant="outlined" size="small" onClick={() => logoutUser()} color="inherit">
-                Sign out
-              </Button>
-              <Typography mx={2}>{user.firstName + ' ' + user.lastName}</Typography>
-              <Avatar />
+              <Hidden smDown>
+                <Button variant="outlined" size="small" onClick={() => logoutUser()} color="inherit">
+                  Sign out
+                </Button>
+              </Hidden>
+              <Typography sx={{ cursor: 'pointer' }} onClick={() => history.push('/profile')} mx={2}>
+                {user.firstName + ' ' + user.lastName}
+              </Typography>
+              <Avatar sx={{ cursor: 'pointer' }} onClick={() => history.push('/profile')} />
             </React.Fragment>
           )}
         </Toolbar>

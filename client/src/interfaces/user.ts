@@ -6,6 +6,17 @@ export interface signupFields {
   password: string;
   role: string;
 }
+
+export interface user {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  role: string;
+  _id?: string;
+  wishesToManage?: boolean;
+}
 export interface loginFields {
   email: string;
   password: string;
@@ -21,5 +32,6 @@ export interface updateUserData {
     email: string;
     firstName: string;
     lastName: string;
+    password?: string;
   };
 }

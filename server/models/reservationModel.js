@@ -11,7 +11,7 @@ const reservationSchema = new mongoose.Schema({
     ref: 'Movie',
     required: [true, 'There must be a movie']
   },
-  reservedSeats: [{ type: Number, unique: true, min: 1, max: 30 }], //The same seat can't be reserved twice
+  reservedSeats: [{ type: Number, min: 1, max: 30 }], //The same seat can't be reserved twice
   createdAt: {
     type: Date,
     default: Date.now()

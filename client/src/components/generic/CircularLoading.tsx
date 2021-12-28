@@ -11,7 +11,7 @@ const CircularLoading: React.FC<CircularLoadingProps> = ({ align }) => {
     start: 'flex-start',
   };
   return (
-    <Box display="flex" justifyContent={positionMap[align ?? 'center']}>
+    <Box pt={2} display="flex" justifyContent={positionMap[align ?? 'center']}>
       <CircularProgress />
     </Box>
   );

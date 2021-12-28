@@ -1,7 +1,7 @@
 import { Box, Grid, IconButton, InputAdornment, MenuItem, Select, TextField } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import countries from '../../config/countries';
 import icons from '../../config/icons';
 import useForm from '../../hooks/logic/useForm';
@@ -31,6 +31,7 @@ interface AutoFormProps {
   extraContent?: ReactNode;
   fullWidthsubmitButton?: boolean;
   notOkayToSubmit?: boolean;
+  initialFieldValues?: any;
 }
 
 const AutoForm: React.FC<AutoFormProps> = ({
@@ -43,9 +44,10 @@ const AutoForm: React.FC<AutoFormProps> = ({
   extraContent,
   fullWidthsubmitButton,
   notOkayToSubmit,
+  initialFieldValues,
 }) => {
   const classes = useStyles();
-  const { form, error, handleFormSubmit, handleFormChange, validationErrorMessage, isSubmitingForm } = useForm(
+  const { form, error, handleFormSubmit, handleFormChange, validationErrorMessage, isSubmitingForm, setForm } = useForm(
     fields.map((field: string) => ({
       name: field,
       required: requiredAll,
@@ -54,6 +56,10 @@ const AutoForm: React.FC<AutoFormProps> = ({
       await onSubmitHandler(data);
     }
   );
+
+  useEffect(() => {
+    if (initialFieldValues) setForm(initialFieldValues);
+  }, [initialFieldValues, setForm]);
 
   const [selectedDialCode, setSelectedDialCode] = useState('+20');
 

@@ -12,6 +12,7 @@ function getModalStyle() {
     top: `${top}%`,
     left: `${left}%`,
     transform: `translate(-${top}%, -${left}%)`,
+    outline: 'none',
   };
 }
 
@@ -22,7 +23,6 @@ const useStyles = makeStyles((theme: any) =>
       width: 400,
       maxWidth: '95%',
       backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
       boxShadow: theme.shadows[5],
       maxHeight: '90%',
       overflow: 'auto',
@@ -33,8 +33,9 @@ const useStyles = makeStyles((theme: any) =>
 interface GenericModalProps {
   open: boolean;
   body: ReactNode;
+  preferableWidth?: number;
 }
-const GenericModal: React.FC<GenericModalProps> = ({ open, body }) => {
+const GenericModal: React.FC<GenericModalProps> = ({ open, body, preferableWidth }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
@@ -49,7 +50,7 @@ const GenericModal: React.FC<GenericModalProps> = ({ open, body }) => {
           if (reason === 'escapeKeyDown') closeGenericModal();
         }}
       >
-        <div style={modalStyle} className={classes.paper}>
+        <div style={{ ...modalStyle, width: preferableWidth ?? 400 }} className={classes.paper}>
           {body}
         </div>
       </Modal>

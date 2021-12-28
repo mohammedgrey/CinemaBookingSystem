@@ -148,9 +148,10 @@ function validateEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-//TODO: change this function to satistfy the constaints required for the password
-function validatePassword(password: string) {
-  return password.length >= 8;
+//Should be more than 8 chars and contain at least 1 char and 1 digit
+export function validatePassword(password: string) {
+  if (!password) return false;
+  return Boolean(password.match('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d^a-zA-Z0-9].{8,50}$'));
 }
 
 function validateConfirmPassword(confirmPassword: string, password: string) {

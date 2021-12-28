@@ -22,7 +22,7 @@ const forms: any = {
   validationErrorMessage: {
     email: 'Incorrect email format.',
     username: 'Should at least be 3 characters with no white spaces.',
-    password: 'Should be at least 8 characters.',
+    password: 'Passwords should be more than 8 characters, and should contain at least 1 digit and 1 letter.',
     confirmPassword: 'Passwords do not match.',
     phone: 'Incorrect phone number',
     required: 'This field is required.',
@@ -32,7 +32,7 @@ const forms: any = {
     address: '',
     city: '',
     country: 'This field is required.',
-    oldPassword: 'Should be at least 8 characters.',
+    oldPassword: 'Passwords should be more than 8 characters, and should contain at least 1 digit and 1 letter.',
     street: 'This field is required.',
     building: 'This field is required.',
     floor: 'This field is required.',

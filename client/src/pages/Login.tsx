@@ -12,7 +12,7 @@ const Login: React.FC<LoginProps> = () => {
   const { notify } = useNotification();
   return (
     <Container maxWidth="sm">
-      <Typography my={2} variant="h6" fontWeight={700} align="center">
+      <Typography pt={2} my={2} variant="h6" fontWeight={700} align="center">
         <Email color="primary" fontSize="large" sx={{ verticalAlign: 'middle', marginInlineEnd: '16px' }}></Email>
         Login to your account
       </Typography>

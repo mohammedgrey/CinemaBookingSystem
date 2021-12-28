@@ -5,15 +5,17 @@ const GenericModalContext: any = createContext(null);
 const GenericModalProvider = ({ children }: any) => {
   const [isGenericModalOpen, setIsGenericModalOpen] = useState(false);
   const [modalBody, setModalBody] = useState<ReactNode>(null);
+  const [modalWidth, setModalWidth] = useState<number>(400);
 
   const [stackOfOpenModals, setStackOfOpenModals] = useState<Array<ReactNode>>([]);
 
-  const openGenericModal = (body: ReactNode) => {
+  const openGenericModal = (body: ReactNode, preferableWidth: number) => {
     if (isGenericModalOpen) {
       setStackOfOpenModals([modalBody, ...stackOfOpenModals]);
     }
 
     setModalBody(body);
+    setModalWidth(preferableWidth);
     setIsGenericModalOpen(true);
   };
 
@@ -32,6 +34,7 @@ const GenericModalProvider = ({ children }: any) => {
         openGenericModal,
         closeGenericModal,
         modalBody,
+        modalWidth,
       }}
     >
       {children}

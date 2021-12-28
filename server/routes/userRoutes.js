@@ -11,6 +11,7 @@ router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 router.get('/me', protect, userController.getMe);
 router.get('/', protect, permit, userController.getAllUsers);
+router.post('/', protect, permit, userController.postUser);
 
 router.put('/me/updatepassword', protect, authController.updatePassword);
 

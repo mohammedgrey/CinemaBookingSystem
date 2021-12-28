@@ -16,7 +16,7 @@ const Signup: React.FC<SignupProps> = () => {
   const [selectedRole, setSelectedRole] = useState<role>(roles.CUSTOMER);
   return (
     <Container maxWidth="md">
-      <Typography my={2} variant="h6" fontWeight={700} align="center">
+      <Typography pt={2} my={2} variant="h6" fontWeight={700} align="center">
         <HowToReg color="primary" fontSize="large" sx={{ verticalAlign: 'middle', marginInlineEnd: '16px' }} />
         Sign up and become a member
       </Typography>

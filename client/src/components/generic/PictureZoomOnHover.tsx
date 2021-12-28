@@ -8,14 +8,14 @@ const useStyles = makeStyles((_: any) =>
       width: '100%',
       height: '100%',
       transform: 'scale(1)',
-      transition: 'transform 1.5s linear',
+      transition: 'transform 1s linear',
     },
     imageOnZoomContainer: {
       position: 'relative',
       overflow: 'hidden',
       '&:hover': {
         '& $imageOnZoom': {
-          transform: 'scale(1.3)',
+          transform: 'scale(1.2)',
         },
       },
     },
