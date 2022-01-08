@@ -14,6 +14,7 @@ import SubmitButton from '../generic/SubmitButton';
 import { Add, Edit } from '@mui/icons-material';
 import { postMovie, updateMovie } from '../../requests/movies';
 import useGenericModal from '../../hooks/popup/useGenericModal';
+import moment from 'moment';
 
 interface MovieAddEditProps {
   movie?: movie;
@@ -73,6 +74,21 @@ const MovieAddEdit: React.FC<MovieAddEditProps> = ({ movie, refetchMovies }) => 
             return;
           }
 
+          const endMomentTime = moment(movieData.endTime);
+          const startMomentTime = moment(movieData.startTime);
+          const startTimeIsPM = startMomentTime.hours() >= 12;
+          const endTimeIsAM = endMomentTime.hours() < 12;
+
+          if (!endMomentTime.isAfter(startMomentTime)) {
+            if (Math.abs(startMomentTime.hours() - endMomentTime.hour()) >= 12 && !(startTimeIsPM && endTimeIsAM)) {
+              setMovieEditAddFailedText('Movie event is too long!');
+              return;
+            } else if (!(startTimeIsPM && endTimeIsAM)) {
+              setMovieEditAddFailedText('End time must be after the start time');
+              return;
+            }
+          }
+
           if (!movieData.image) {
             setMovieEditAddFailedText('Please select a movie poster');
             return;
@@ -108,6 +124,7 @@ const MovieAddEdit: React.FC<MovieAddEditProps> = ({ movie, refetchMovies }) => 
             />
             {/* Date */}
             <MobileDatePicker
+              minDate={new Date()}
               label="Movie Screening Date"
               inputFormat="MM/dd/yyyy"
               value={new Date(movieData.date)}

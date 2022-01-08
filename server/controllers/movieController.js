@@ -51,9 +51,26 @@ exports.postMovie = catchAsync(async (req, res, next) => {
     room: req.body.room,
     date: { $gte: yesterday }
   }).select('startTime endTime');
+
+  const dateObj = new Date(req.body.date);
+  let { startTime, endTime } = req.body;
+  startTime = new Date(startTime);
+  startTime.setFullYear(dateObj.getFullYear());
+  startTime.setDate(dateObj.getDate());
+  startTime.setMonth(dateObj.getMonth());
+  endTime = new Date(endTime);
+  endTime.setFullYear(dateObj.getFullYear());
+  endTime.setDate(dateObj.getDate());
+  endTime.setMonth(dateObj.getMonth());
+
+  //if start is pm and end is am
+  if (startTime.getHours() >= 12 && endTime.getHours() < 12) {
+    //then increase the end time by one day
+    endTime.setDate(endTime.getDate() + 1);
+  }
   const currentMovieDate = {
-    startTime: req.body.startTime,
-    endTime: req.body.endTime
+    startTime,
+    endTime
   };
 
   const okayToAddMovie = thereIsATimeSlotAvailable(
@@ -69,7 +86,7 @@ exports.postMovie = catchAsync(async (req, res, next) => {
       )
     );
 
-  const movie = await Movie.create(req.body);
+  const movie = await Movie.create({ ...req.body, startTime, endTime });
   res.status(201).json({
     status: 'success',
     data: {
@@ -86,9 +103,27 @@ exports.updateMovie = catchAsync(async (req, res, next) => {
     date: { $gte: yesterday },
     _id: { $ne: req.params.id }
   }).select('startTime endTime');
+
+  const dateObj = new Date(req.body.date);
+  let { startTime, endTime } = req.body;
+  startTime = new Date(startTime);
+  startTime.setFullYear(dateObj.getFullYear());
+  startTime.setDate(dateObj.getDate());
+  startTime.setMonth(dateObj.getMonth());
+  endTime = new Date(endTime);
+  endTime.setFullYear(dateObj.getFullYear());
+  endTime.setDate(dateObj.getDate());
+  endTime.setMonth(dateObj.getMonth());
+
+  //if start is pm and end is am
+  if (startTime.getHours() >= 12 && endTime.getHours() < 12) {
+    //then increase the end time by one day
+    endTime.setDate(endTime.getDate() + 1);
+  }
+
   const currentMovieDate = {
-    startTime: req.body.startTime,
-    endTime: req.body.endTime
+    startTime,
+    endTime
   };
 
   const okayToAddMovie = thereIsATimeSlotAvailable(
@@ -104,10 +139,14 @@ exports.updateMovie = catchAsync(async (req, res, next) => {
       )
     );
 
-  const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  const movie = await Movie.findByIdAndUpdate(
+    req.params.id,
+    { ...req.body, startTime, endTime },
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
   if (!movie) {
     return next(new AppError('No movie found with that ID', 404));

@@ -1,14 +1,15 @@
 import { createContext, useEffect, useState } from 'react';
 import useLocalStorage from '../hooks/storage/useLocalStorage';
-import { getToken, removeToken, setToken } from '../utils/tokenHandler';
 
 import useNotification from '../hooks/popup/useNotification';
 import { login } from '../requests/users';
+import { tokenKey } from '../utils/tokenHandler';
 
 const UserContext: any = createContext(null);
 
 const UserProvider = ({ children }: any) => {
   const [user, setUser] = useLocalStorage('user', null);
+  const [token, setToken] = useLocalStorage(tokenKey, null);
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | undefined>(undefined);
   const { notify } = useNotification();
@@ -32,19 +33,29 @@ const UserProvider = ({ children }: any) => {
 
   //For logging the users out
   const logoutUser = () => {
-    removeToken();
+    setToken(null);
     setUser(null);
+    setIsLoggedIn(false);
   };
-
-  //To get the user token
-  const getUserToken = () => {
-    return getToken();
-  };
+  console.log(isLoggedIn);
 
   //To check whether the user is logged in or not
   useEffect(() => {
-    setIsLoggedIn(user !== (null || undefined) && getUserToken() !== (null || undefined));
-  }, [user, setIsLoggedIn]);
+    if (
+      user == null ||
+      user == undefined ||
+      user == 'null' ||
+      user == 'undefined' ||
+      token == null ||
+      token == undefined ||
+      token == 'null' ||
+      token == 'undefined'
+    ) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  }, [user, token]);
 
   return (
     <UserContext.Provider
@@ -52,7 +63,6 @@ const UserProvider = ({ children }: any) => {
         user,
         loginUser,
         logoutUser,
-        getUserToken,
         setUserAndUserToken,
         isLoggedIn,
       }}

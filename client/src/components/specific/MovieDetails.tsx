@@ -28,6 +28,12 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie }) => {
   const { openGenericModal, closeGenericModal } = useGenericModal();
   const commonClasses = useCommonStyles();
 
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      setReservedSeats([]);
+    }
+  }, [isLoggedIn]);
+
   return (
     <Grid container columnSpacing={2} sx={{ paddingBlockEnd: '16px' }}>
       <Grid item xs={12} sm={6} md={4} lg={3}>
