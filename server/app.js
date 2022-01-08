@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000', 'https://cinemabookingsystem.web.app']
+    origin: ['http://localhost:3000', 'https://cinemamoviesbooking.web.app']
   })
 );
 app.options('*', cors());
